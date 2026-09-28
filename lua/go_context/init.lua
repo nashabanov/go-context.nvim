@@ -95,6 +95,7 @@ end
 
 function M.setup()
     require("go_context.commands").setup()
+    require("go_context.suggest").setup()
 end
 
 return M
