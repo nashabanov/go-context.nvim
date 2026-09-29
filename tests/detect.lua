@@ -20,7 +20,7 @@ local function run()
     }
     for _, case in ipairs(cases) do
         vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
-            "// Заголовок", "//go:build " .. case[1], "", "package foo",
+            "// Header", "//go:build " .. case[1], "", "package foo",
             "//go:build after_package",
         })
         assert(vim.deep_equal(detect.buffer(buf), case[2]), case[1])
@@ -34,5 +34,5 @@ if not ok then
     io.stderr:write(err .. "\n")
     vim.cmd("cquit 1")
 end
-print("PASS: обнаружение build-тегов буфера")
+print("PASS: buffer build tag detection")
 vim.cmd("qa!")

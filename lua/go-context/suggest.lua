@@ -49,11 +49,11 @@ function M.buffer(bufnr)
     end
 
     pending[root] = true
-    local ok, failure = pcall(vim.ui.select, { "Добавить", "Отклонить" }, {
-        prompt = "Новые Go build-теги: " .. table.concat(missing, ", ")
-            .. ". Добавить в контекст workspace?",
+    local ok, failure = pcall(vim.ui.select, { "Add", "Decline" }, {
+        prompt = "New Go build tags found: " .. table.concat(missing, ", ")
+            .. ". Add them to this workspace context?",
     }, function(_, choice)
-        -- Блокировка действует и во время set: обработчики событий могут войти в буфер повторно.
+        -- Keep the lock during set: event handlers may re-enter the buffer.
         local applied, apply_err = pcall(function()
             if choice ~= 1 then
                 ignored[root] = ignored[root] or {}
@@ -99,7 +99,7 @@ function M.setup()
         callback = function(event)
             M.buffer(event.buf)
         end,
-        desc = "Предложить build-теги текущего Go-буфера",
+        desc = "Suggest build tags from the current Go buffer",
     })
 end
 

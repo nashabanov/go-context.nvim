@@ -71,6 +71,8 @@ flags are preserved. Clearing the context removes `-tags`.
 
 ## Usage
 
+See `:help go-context` for in-editor help and `:help :GoContext` for commands.
+
 Open a Go file inside a workspace and set the tags you need:
 
 ```vim
