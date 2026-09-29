@@ -5,7 +5,7 @@ local root = vim.fn.fnamemodify(
 
 vim.opt.rtp:prepend(root)
 
-local store = require("go_context.store")
+local store = require("go-context.store")
 
 local workspace = vim.fn.tempname()
 vim.fn.mkdir(workspace, "p")

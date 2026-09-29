@@ -5,10 +5,10 @@ local root = vim.fn.fnamemodify(
 
 vim.opt.rtp:prepend(root)
 
-local go_context = require("go_context")
-local workspace = require("go_context.workspace")
-local store = require("go_context.store")
-local gopls = require("go_context.adapters.gopls")
+local go_context = require("go-context")
+local workspace = require("go-context.workspace")
+local store = require("go-context.store")
+local gopls = require("go-context.adapters.gopls")
 
 local original_root = workspace.root
 local original_normalize = workspace.normalize

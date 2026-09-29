@@ -1,6 +1,6 @@
 local root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
 vim.opt.rtp:prepend(root)
-local detect = require("go_context.detect")
+local detect = require("go-context.detect")
 
 local function run()
     local buf = vim.api.nvim_create_buf(false, true)

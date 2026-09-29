@@ -19,13 +19,13 @@ function M.buffer(bufnr)
         return
     end
 
-    local go_context = require("go_context")
+    local go_context = require("go-context")
     local root = go_context.root({ bufnr = bufnr })
     if not root or pending[root] then
         return
     end
 
-    local detected = require("go_context.detect").buffer(bufnr)
+    local detected = require("go-context.detect").buffer(bufnr)
     if #detected == 0 then
         return
     end

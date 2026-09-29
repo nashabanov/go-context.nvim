@@ -1,5 +1,5 @@
-local context = require("go_context.context")
-local workspace = require("go_context.workspace")
+local context = require("go-context.context")
+local workspace = require("go-context.workspace")
 
 local M = {}
 

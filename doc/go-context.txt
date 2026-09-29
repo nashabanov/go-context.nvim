@@ -5,12 +5,12 @@ SETUP                                                        *go-context*
                                                              *go-context-setup*
 Requires Neovim 0.10 or later. Enable commands and tag suggestions: >lua
 
-    require("go_context").setup()
+    require("go-context").setup()
 <
 To apply saved tags when gopls starts, add this field to your existing gopls
 configuration: >lua
 
-    before_init = require("go_context").before_init,
+    before_init = require("go-context").before_init,
 <
 The plugin does not install or start gopls. Context changes update running
 gopls clients with a matching workspace root.

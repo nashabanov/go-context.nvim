@@ -1,4 +1,4 @@
-local context = require("go_context.context")
+local context = require("go-context.context")
 
 local M = {}
 
@@ -43,7 +43,7 @@ local function set_tags(go_context, root, value)
 end
 
 function M.setup()
-    local go_context = require("go_context")
+    local go_context = require("go-context")
 
     vim.api.nvim_create_user_command("GoContext", function(opts)
         local root = current_root(go_context)

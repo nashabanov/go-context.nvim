@@ -1,7 +1,7 @@
-local context = require("go_context.context")
-local workspace = require("go_context.workspace")
-local store = require("go_context.store")
-local gopls = require("go_context.adapters.gopls")
+local context = require("go-context.context")
+local workspace = require("go-context.workspace")
+local store = require("go-context.store")
+local gopls = require("go-context.adapters.gopls")
 
 local M = {}
 
@@ -94,8 +94,8 @@ function M.before_init(...)
 end
 
 function M.setup()
-    require("go_context.commands").setup()
-    require("go_context.suggest").setup()
+    require("go-context.commands").setup()
+    require("go-context.suggest").setup()
 end
 
 return M

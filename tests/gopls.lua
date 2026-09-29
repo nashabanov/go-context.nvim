@@ -5,8 +5,8 @@ local root = vim.fn.fnamemodify(
 
 vim.opt.rtp:prepend(root)
 
-local gopls = require("go_context.adapters.gopls")
-local store = require("go_context.store")
+local gopls = require("go-context.adapters.gopls")
+local store = require("go-context.store")
 
 local dir = vim.fn.tempname()
 

@@ -1,6 +1,6 @@
-local store = require("go_context.store")
-local workspace = require("go_context.workspace")
-local context = require("go_context.context")
+local store = require("go-context.store")
+local workspace = require("go-context.workspace")
+local context = require("go-context.context")
 
 local M = {}
 

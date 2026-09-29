@@ -5,7 +5,7 @@ local root = vim.fn.fnamemodify(
 
 vim.opt.rtp:prepend(root)
 
-local context = require("go_context.context")
+local context = require("go-context.context")
 
 local function run()
     assert(vim.deep_equal(

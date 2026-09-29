@@ -32,7 +32,7 @@ With [lazy.nvim](https://github.com/folke/lazy.nvim):
   "nashabanov/go-context.nvim",
   lazy = false,
   config = function()
-    require("go_context").setup()
+    require("go-context").setup()
   end,
 }
 ```
@@ -40,7 +40,7 @@ With [lazy.nvim](https://github.com/folke/lazy.nvim):
 With another plugin manager, install `nashabanov/go-context.nvim` and call:
 
 ```lua
-require("go_context").setup()
+require("go-context").setup()
 ```
 
 `setup()` registers the commands and the `BufEnter *.go` handler. There are
@@ -52,7 +52,7 @@ Add `before_init` to your existing `gopls` configuration to apply the saved
 context when the server starts:
 
 ```lua
-before_init = require("go_context").before_init,
+before_init = require("go-context").before_init,
 ```
 
 If you already use a `before_init` callback, combine the calls:
@@ -60,7 +60,7 @@ If you already use a `before_init` callback, combine the calls:
 ```lua
 before_init = function(params, config)
   -- Your existing configuration changes.
-  require("go_context").before_init(params, config)
+  require("go-context").before_init(params, config)
 end,
 ```
 
@@ -147,7 +147,7 @@ your own integrations.
 ## Lua API
 
 ```lua
-local go_context = require("go_context")
+local go_context = require("go-context")
 
 -- Use the current buffer's workspace.
 local root, err = go_context.root()
