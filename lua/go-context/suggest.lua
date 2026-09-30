@@ -3,7 +3,7 @@ local M = {}
 local ignored, pending = {}, {}
 
 local function report(err)
-    vim.notify(tostring(err), vim.log.levels.ERROR, { title = "go-context.nvim" })
+    vim.notify(tostring(err), vim.log.levels.ERROR, { title = "Go build tags" })
 end
 
 function M.buffer(bufnr)
@@ -49,9 +49,8 @@ function M.buffer(bufnr)
     end
 
     pending[root] = true
-    local ok, failure = pcall(vim.ui.select, { "Add", "Decline" }, {
-        prompt = "New Go build tags found: " .. table.concat(missing, ", ")
-            .. ". Add them to this workspace context?",
+    local ok, failure = pcall(require("go-context.ui").select, { "Add tags", "Ignore for this session" }, {
+        tags = missing,
     }, function(_, choice)
         -- Keep the lock during set: event handlers may re-enter the buffer.
         local applied, apply_err = pcall(function()

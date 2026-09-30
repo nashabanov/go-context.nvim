@@ -4,7 +4,7 @@ local M = {}
 
 local function notify(message, level)
     vim.notify(message, level, {
-        title = "go-context.nvim",
+        title = "Go build tags",
     })
 end
 
@@ -36,7 +36,7 @@ local function set_tags(go_context, root, value)
     local tags = go_context.tags({ root = root })
 
     notify(
-        "Go build tags: "
+        "Tags: "
         .. (#tags > 0 and table.concat(tags, ", ") or "none"),
         vim.log.levels.INFO
     )
@@ -62,7 +62,7 @@ function M.setup()
                 return
             end
 
-            notify("Go build tags: none", vim.log.levels.INFO)
+            notify("Tags cleared", vim.log.levels.INFO)
             return
         end
 
@@ -80,11 +80,10 @@ function M.setup()
             return
         end
 
-        vim.ui.input({
-            prompt = "Go build tags (comma/space separated): ",
+        require("go-context.ui").input({
             default = table.concat(
                 current and current.tags or {},
-                ","
+                ", "
             ),
         }, function(value)
             if value == nil then
@@ -115,7 +114,7 @@ function M.setup()
             return
         end
 
-        notify("Go build tags: none", vim.log.levels.INFO)
+        notify("Tags cleared", vim.log.levels.INFO)
     end, {
         desc = "Clear Go build context for the current workspace",
     })

@@ -21,8 +21,8 @@ local function run()
         pattern = "GoContextChanged",
         callback = function(event) events[#events + 1] = event.data end,
     })
-    vim.ui.select = function(items, opts, callback)
-        prompts[#prompts + 1] = { items = items, prompt = opts.prompt, answer = callback }
+    require("go-context.ui").select = function(items, opts, callback)
+        prompts[#prompts + 1] = { items = items, tags = opts.tags, answer = callback }
     end
     local buf = vim.api.nvim_create_buf(true, false)
     vim.api.nvim_buf_set_name(buf, "/tmp/suggestion.go")
@@ -40,8 +40,7 @@ local function run()
     assert(#prompts == 0)
     enter("integration && postgres")
     assert(#prompts == 1)
-    assert(prompts[1].prompt:find("postgres", 1, true))
-    assert(not prompts[1].prompt:find("integration", 1, true))
+    assert(vim.deep_equal(prompts[1].tags, { "postgres" }))
     enter("integration && postgres")
     assert(#prompts == 1, "A pending prompt must not be repeated")
     saved[project].tags[#saved[project].tags + 1] = "smoke"

@@ -13,7 +13,7 @@ trap cleanup EXIT INT TERM
 
 export XDG_STATE_HOME="$STATE"
 
-for test in context store gopls integration detect suggest; do
+for test in context store gopls integration detect suggest ui; do
     printf 'Running %s...\n' "$test"
 
     nvim \

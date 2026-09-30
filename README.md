@@ -84,13 +84,15 @@ duplicates are removed while preserving order.
 
 | Command | Action |
 | --- | --- |
-| `:GoContext` | Open a tag input prompt prefilled with the current values |
+| `:GoContext` | Open a compact floating input with the current values |
 | `:GoContext integration,smoke` | Replace the workspace tags |
 | `:GoContext integration smoke` | Replace tags using a space-separated list |
 | `:GoContext!` | Clear the workspace context |
 | `:GoContextClear` | Clear the workspace context |
 
-Submitting an empty value in `:GoContext` saves an empty tag list. The clear
+The input opens in a compact floating window with colors from your theme.
+Press Enter to save or Esc to cancel. Submitting an empty value in `:GoContext`
+saves an empty tag list. The clear
 commands also remove the workspace's saved record.
 
 ### Suggestions from Go files
@@ -107,7 +109,9 @@ package storage
 ```
 
 Only `postgres` is suggested. Accepting it changes the context to
-`{ "integration", "postgres" }`. The prompt uses `vim.ui.select`.
+`{ "integration", "postgres" }`. A compact floating window shows the new tags
+and two actions: **Add tags** and **Ignore for this session**. Use `j`/`k`, arrow
+keys, or Tab to choose, Enter to confirm, and Esc to cancel.
 
 - Accepted tags are appended to the existing tags and saved through the normal context update path.
 - Declined tags are not suggested again in that workspace for the rest of the Neovim session.

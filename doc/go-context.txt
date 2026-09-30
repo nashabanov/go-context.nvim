@@ -19,7 +19,8 @@ gopls clients with a matching workspace root.
 COMMANDS                                                     *go-context-commands*
 
 :GoContext                                                   *:GoContext*
-        Open a tag input prompt prefilled with the current workspace tags.
+        Open a compact floating input with the current workspace tags.
+        Enter saves; Esc cancels. Separate tags with commas or spaces.
         Submit an empty value to save an empty tag list. Cancel to leave the
         context unchanged.
 
@@ -45,7 +46,9 @@ Contexts persist outside the repository under:
 TAG SUGGESTIONS                                               *go-context-suggestions*
 
 Entering a *.go buffer checks //go:build directives before the package
-declaration. New custom tags are offered through vim.ui.select.
+declaration. A compact floating window lists new custom tags and offers
+"Add tags" or "Ignore for this session". Use j/k, arrow keys, or Tab to
+choose an action; Enter confirms and Esc cancels. Colors follow your theme.
 
 Accepted tags are appended to the workspace context and saved. Declining or
 dismissing a prompt suppresses those tags in that workspace for the rest of
