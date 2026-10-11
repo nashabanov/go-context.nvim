@@ -7,6 +7,16 @@ local function press(key)
 end
 
 local function run()
+    local buffers = #vim.api.nvim_list_bufs()
+    local open = vim.api.nvim_open_win
+    vim.api.nvim_open_win = function()
+        error("simulated window failure")
+    end
+    assert(not pcall(ui.input, {}, function()
+        error("unexpected callback")
+    end))
+    vim.api.nvim_open_win = open
+    assert(#vim.api.nvim_list_bufs() == buffers, "Failed UI must not leak buffers")
     local original = vim.api.nvim_get_current_win()
     local answers = {}
     local function answer(value, index)
@@ -40,6 +50,17 @@ local function run()
     vim.api.nvim_set_current_win(original)
     assert(#answers == 4 and answers[4].value == nil)
     assert(#vim.api.nvim_list_wins() == 1)
+    ui.input({}, answer)
+    buf = vim.api.nvim_get_current_buf()
+    vim.api.nvim_buf_delete(buf, { force = true })
+    assert(#answers == 5 and answers[5].value == nil)
+    assert(#vim.api.nvim_list_wins() == 1)
+    ui.input({}, answer)
+    local win = vim.api.nvim_get_current_win()
+    buf = vim.api.nvim_get_current_buf()
+    vim.api.nvim_win_close(win, true)
+    assert(#answers == 6 and answers[6].value == nil)
+    assert(not vim.api.nvim_buf_is_valid(buf))
 end
 
 local ok, err = xpcall(run, debug.traceback)

@@ -21,9 +21,12 @@ function M.get(root)
 
     local path = M.path(root)
 
-    if vim.fn.filereadable(path) == 0 then
+    local stat, err, code = uv.fs_stat(path)
+    if not stat and code == "ENOENT" then
         return nil
     end
+    assert(stat, "Could not read go-context state: " .. tostring(err))
+    assert(stat.type == "file", "Go context state is not a file")
 
     local raw = table.concat(vim.fn.readfile(path), "\n")
     local payload = vim.json.decode(raw)
@@ -33,11 +36,9 @@ function M.get(root)
         "Unsupported go-context state format"
     )
 
-    assert(
-        payload.root == root,
-        "Go context state belongs to another workspace"
-    )
+    assert(payload.root == root, "Go context state belongs to another workspace")
 
+    assert(type(payload.context) == "table", "Invalid Go context state")
     return context.normalize(payload.context)
 end
 
@@ -61,10 +62,11 @@ function M.set(root, value)
 
     local temp = path .. ".tmp." .. tostring(vim.fn.getpid())
 
-    assert(
-        vim.fn.writefile({ payload }, temp) == 0,
-        "Could not write go-context state"
-    )
+    local written, result = pcall(vim.fn.writefile, { payload }, temp)
+    if not written or result ~= 0 then
+        vim.fn.delete(temp)
+        error("Could not write go-context state: " .. tostring(result))
+    end
 
     local ok, err = uv.fs_rename(temp, path)
 
@@ -79,14 +81,14 @@ end
 function M.delete(root)
     local path = M.path(root)
 
-    if vim.fn.filereadable(path) == 0 then
+    local stat, err, code = uv.fs_stat(path)
+    if not stat and code == "ENOENT" then
         return
     end
+    assert(stat, "Could not access go-context state: " .. tostring(err))
+    assert(stat.type == "file", "Go context state is not a file")
 
-    assert(
-        vim.fn.delete(path) == 0,
-        "Could not delete go-context state"
-    )
+    assert(vim.fn.delete(path) == 0, "Could not delete go-context state")
 end
 
 return M

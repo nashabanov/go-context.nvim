@@ -1,14 +1,16 @@
 local M = {}
 
 local reserved = {}
-for tag in ([[
+for tag in
+    ([[
     aix android darwin dragonfly freebsd hurd illumos ios js linux nacl netbsd
     openbsd plan9 solaris wasip1 windows zos
     386 amd64 amd64p32 arm armbe arm64 arm64be loong64 mips mipsle mips64
     mips64le mips64p32 mips64p32le ppc ppc64 ppc64le riscv riscv64 s390 s390x
     sparc sparc64 wasm
     unix cgo gc gccgo ignore
-]]):gmatch("%S+") do
+]]):gmatch("%S+")
+do
     reserved[tag] = true
 end
 
@@ -26,7 +28,8 @@ function M.buffer(bufnr)
         if expression then
             for start, tag in expression:gmatch("()([%w_.]+)") do
                 local prefix = expression:sub(1, start - 1)
-                if not prefix:match("!%s*$")
+                if
+                    not prefix:match("!%s*$")
                     and not reserved[tag]
                     and not tag:match("^go1%.%d+$")
                     and not seen[tag]

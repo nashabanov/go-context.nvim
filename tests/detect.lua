@@ -11,16 +11,23 @@ local function run()
         { "postgres && postgres", { "postgres" } },
         { "linux && windows && darwin && integration", { "integration" } },
         { "amd64 || arm64 || wasm || loong64 || custom", { "custom" } },
-        { "unix", {} }, { "cgo", {} }, { "gc", {} },
-        { "gccgo", {} }, { "ignore", {} },
+        { "unix", {} },
+        { "cgo", {} },
+        { "gc", {} },
+        { "gccgo", {} },
+        { "ignore", {} },
         { "go1.23 && go1.100 && go1.custom", { "go1.custom" } },
-        { "!enterprise", {} }, { "! enterprise && smoke", { "smoke" } },
+        { "!enterprise", {} },
+        { "! enterprise && smoke", { "smoke" } },
         { "postgres || sqlite", { "postgres", "sqlite" } },
         { "!enterprise || enterprise", { "enterprise" } },
     }
     for _, case in ipairs(cases) do
         vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
-            "// Header", "//go:build " .. case[1], "", "package foo",
+            "// Header",
+            "//go:build " .. case[1],
+            "",
+            "package foo",
             "//go:build after_package",
         })
         assert(vim.deep_equal(detect.buffer(buf), case[2]), case[1])

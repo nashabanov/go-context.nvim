@@ -3,11 +3,16 @@ local M = {}
 local uv = vim.uv or vim.loop
 
 function M.normalize(root)
-    if not root then
+    if type(root) ~= "string" or root == "" then
         return nil
     end
 
-    return uv.fs_realpath(root) or vim.fs.normalize(root)
+    root = vim.fn.fnamemodify(root, ":p")
+    root = vim.fs.normalize(root)
+    if root ~= "/" and not root:match("^%a:/$") then
+        root = root:gsub("/+$", "")
+    end
+    return uv.fs_realpath(root) or root
 end
 
 function M.root(bufnr)
@@ -15,10 +20,12 @@ function M.root(bufnr)
 
     local roots = {}
 
-    for _, client in ipairs(vim.lsp.get_clients({
-        bufnr = bufnr,
-        name = "gopls",
-    })) do
+    for _, client in
+        ipairs(vim.lsp.get_clients({
+            bufnr = bufnr,
+            name = "gopls",
+        }))
+    do
         local root = M.normalize(client.config.root_dir)
 
         if root then

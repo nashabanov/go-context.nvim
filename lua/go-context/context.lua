@@ -1,6 +1,10 @@
 local M = {}
 
 local function normalize_tags(tags)
+    assert(
+        tags == nil or (type(tags) == "table" and vim.islist(tags)),
+        "Go build tags must be a list"
+    )
     local result, seen = {}, {}
 
     for _, tag in ipairs(tags or {}) do
@@ -31,10 +35,11 @@ function M.parse_tags(value)
 end
 
 function M.normalize(context)
+    assert(context == nil or type(context) == "table", "Go context must be a table")
     context = context or {}
 
     return {
-        tags = normalize_tags(context.tags)
+        tags = normalize_tags(context.tags),
     }
 end
 

@@ -9,7 +9,8 @@ local function resolve_root(opts)
     opts = opts or {}
 
     if opts.root then
-        return workspace.normalize(opts.root)
+        local root = workspace.normalize(opts.root)
+        return root, not root and "Go workspace root is required" or nil
     end
 
     return workspace.root(opts.bufnr or 0)
@@ -20,8 +21,8 @@ local function emit_changed(root, value)
         pattern = "GoContextChanged",
         data = {
             root = root,
-            context = vim.deepcopy(value)
-        }
+            context = vim.deepcopy(value),
+        },
     })
 end
 
@@ -68,11 +69,9 @@ function M.clear(opts)
         tags = {},
     }
 
-    -- First remove the active build flags from running clients.
-    gopls.update(root, value)
-
-    -- No reason to persist an empty context.
+    -- Do not change running clients if deleting the saved state fails.
     store.delete(root)
+    gopls.update(root, value)
 
     emit_changed(root, value)
 

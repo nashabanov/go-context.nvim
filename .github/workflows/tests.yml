@@ -19,10 +19,17 @@ jobs:
         uses: rhysd/action-setup-vim@v1
         with:
           neovim: true
-          version: stable
+          version: v0.10.4
 
       - name: Neovim version
         run: nvim --version
+
+      - name: Check Lua formatting
+        uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: v2.5.2
+          args: --check lua plugin tests
 
       - name: Run tests
         run: sh tests/run.sh

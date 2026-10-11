@@ -61,4 +61,67 @@ are not fully parsed: postgres || sqlite suggests both tags.
 Only the current buffer is inspected. Legacy // +build directives and filename
 constraints are not considered. Tags are never removed automatically.
 
+==============================================================================
+LUA API                                                      *go-context-api*
+
+    local gc = require("go-context")
+    gc.root(opts)           -> root or nil, error
+    gc.get(opts)            -> context or nil, error
+    gc.tags(opts)           -> copied tag list, or {} on missing context/error
+    gc.set(context, opts)   -> normalized context; raises on failure
+    gc.clear(opts)          -> { tags = {} }; raises on failure
+    gc.before_init(params, config)
+    gc.setup()
+
+opts is optional: { root = "/path/to/project", bufnr = 12 }. Explicit root
+wins over bufnr; otherwise the current buffer is used. Root must be a nonempty
+path. Relative paths use the current working directory; roots become absolute
+and existing paths resolve through symlinks. The fallback uses the nearest
+go.work or go.mod. Distinct attached gopls roots return an ambiguity error.
+
+Context is { tags = { "integration", "smoke" } }. Tags must be a list of
+strings containing letters, digits, underscores or dots. Order is preserved;
+duplicates are removed. Returned contexts/lists do not alias persisted state.
+get() returns nil without error when no saved context exists. Use get() rather
+than tags() to distinguish errors from an empty context.
+
+setup() accepts no options. Repeated calls replace commands/autocmds without
+resetting the session's declined tags. before_init can be composed with an
+existing callback; call it after your configuration changes.
+
+==============================================================================
+EVENT                                                        *go-context-event*
+
+Successful set()/clear() triggers User GoContextChanged with event.data:
+
+    { root = normalized_root, context = { tags = { ... } } }
+
+The event context is copied. It fires after saving/deleting state and sending
+client configuration updates. Server reloading is asynchronous; the event does
+not guarantee that gopls has finished applying the new configuration.
+
+==============================================================================
+STORAGE AND ERRORS                                           *go-context-storage*
+
+Records use version-1 JSON at stdpath("state")/go_context.nvim/<root hash>.json.
+Saving uses a temporary file followed by rename. Corrupt/unreadable state raises
+an error in the storage layer; get() returns nil, error. Loading never repairs
+or overwrites a corrupt record. Commands notify errors. before_init warns and
+leaves configuration unchanged when loading fails.
+
+Clear deletes state before updating clients; deletion failure leaves their
+settings unchanged. Persistence and client updates are not a transaction: an
+LSP notification failure may occur after the saved record changed. Concurrent
+Neovim sessions use the last successfully saved context.
+
+Existing -tags options are replaced; unrelated buildFlags are preserved.
+Clearing removes -tags from matching clients. With no saved context, before_init
+leaves manually configured flags unchanged. A saved empty list removes tags.
+Client matching uses config.root_dir, not individual workspace_folders. Separate
+clients are required for independent contexts across folders in one LSP session.
+
+The plugin does not modify Go test, debugger, or linter commands. Detection
+extracts identifiers rather than parsing Go syntax; parenthesized negations,
+block comments and malformed expressions are not interpreted semantically.
+
 vim:tw=78:ts=8:noet:ft=help:norl:

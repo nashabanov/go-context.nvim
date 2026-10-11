@@ -35,11 +35,7 @@ local function set_tags(go_context, root, value)
 
     local tags = go_context.tags({ root = root })
 
-    notify(
-        "Tags: "
-        .. (#tags > 0 and table.concat(tags, ", ") or "none"),
-        vim.log.levels.INFO
-    )
+    notify("Tags: " .. (#tags > 0 and table.concat(tags, ", ") or "none"), vim.log.levels.INFO)
 end
 
 function M.setup()
@@ -81,10 +77,7 @@ function M.setup()
         end
 
         require("go-context.ui").input({
-            default = table.concat(
-                current and current.tags or {},
-                ", "
-            ),
+            default = table.concat(current and current.tags or {}, ", "),
         }, function(value)
             if value == nil then
                 return

@@ -1,22 +1,27 @@
-local root = vim.fn.fnamemodify(
-    debug.getinfo(1, "S").source:sub(2),
-    ":p:h:h"
-)
+local root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
 
 vim.opt.rtp:prepend(root)
 
 local context = require("go-context.context")
 
 local function run()
-    assert(vim.deep_equal(
-        context.parse_tags("integration,smoke e2e"),
-        { "integration", "smoke", "e2e" }
-    ))
+    for _, tags in ipairs({ "wrong", { named = "tag" }, { [2] = "tag" } }) do
+        assert(not pcall(context.normalize, { tags = tags }))
+    end
+    assert(not pcall(context.normalize, false))
+    assert(
+        vim.deep_equal(
+            context.parse_tags("integration,smoke e2e"),
+            { "integration", "smoke", "e2e" }
+        )
+    )
 
-    assert(vim.deep_equal(
-        context.parse_tags("integration integration,smoke"),
-        { "integration", "smoke" }
-    ))
+    assert(
+        vim.deep_equal(
+            context.parse_tags("integration integration,smoke"),
+            { "integration", "smoke" }
+        )
+    )
 
     assert(vim.deep_equal(
         context.normalize({
@@ -27,24 +32,15 @@ local function run()
         }
     ))
 
-    assert(vim.deep_equal(
-        context.normalize({}),
-        {
-            tags = {},
-        }
-    ))
+    assert(vim.deep_equal(context.normalize({}), {
+        tags = {},
+    }))
 
-    assert(
-        not pcall(context.parse_tags, "integration;rm"),
-        "invalid tag should fail"
-    )
+    assert(not pcall(context.parse_tags, "integration;rm"), "invalid tag should fail")
 
-    assert(
-        not pcall(context.normalize, {
-            tags = { "integration", "bad-tag" },
-        }),
-        "invalid normalized tag should fail"
-    )
+    assert(not pcall(context.normalize, {
+        tags = { "integration", "bad-tag" },
+    }), "invalid normalized tag should fail")
 end
 
 local ok, err = xpcall(run, debug.traceback)

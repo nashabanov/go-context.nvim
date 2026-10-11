@@ -11,10 +11,10 @@ function M.buffer(bufnr)
     if bufnr == 0 then
         bufnr = vim.api.nvim_get_current_buf()
     end
-    if not vim.api.nvim_buf_is_valid(bufnr)
+    if
+        not vim.api.nvim_buf_is_valid(bufnr)
         or vim.bo[bufnr].buftype ~= ""
-        or (vim.bo[bufnr].filetype ~= "go"
-            and not vim.api.nvim_buf_get_name(bufnr):match("%.go$"))
+        or (vim.bo[bufnr].filetype ~= "go" and not vim.api.nvim_buf_get_name(bufnr):match("%.go$"))
     then
         return
     end
@@ -49,41 +49,46 @@ function M.buffer(bufnr)
     end
 
     pending[root] = true
-    local ok, failure = pcall(require("go-context.ui").select, { "Add tags", "Ignore for this session" }, {
-        tags = missing,
-    }, function(_, choice)
-        -- Keep the lock during set: event handlers may re-enter the buffer.
-        local applied, apply_err = pcall(function()
-            if choice ~= 1 then
-                ignored[root] = ignored[root] or {}
-                for _, tag in ipairs(missing) do
-                    ignored[root][tag] = true
+    local ok, failure = pcall(
+        require("go-context.ui").select,
+        { "Add tags", "Ignore for this session" },
+        {
+            tags = missing,
+        },
+        function(_, choice)
+            -- Keep the lock during set: event handlers may re-enter the buffer.
+            local applied, apply_err = pcall(function()
+                if choice ~= 1 then
+                    ignored[root] = ignored[root] or {}
+                    for _, tag in ipairs(missing) do
+                        ignored[root][tag] = true
+                    end
+                    return
                 end
-                return
-            end
 
-            local latest, read_err = go_context.get({ root = root })
-            if read_err then
-                error(read_err)
-            end
-            local tags = vim.deepcopy(latest and latest.tags or {})
-            local seen = {}
-            for _, tag in ipairs(tags) do
-                seen[tag] = true
-            end
-            for _, tag in ipairs(missing) do
-                if not seen[tag] then
-                    tags[#tags + 1] = tag
+                local latest, read_err = go_context.get({ root = root })
+                if read_err then
+                    error(read_err)
+                end
+                local tags = vim.deepcopy(latest and latest.tags or {})
+                local seen = {}
+                for _, tag in ipairs(tags) do
                     seen[tag] = true
                 end
+                for _, tag in ipairs(missing) do
+                    if not seen[tag] then
+                        tags[#tags + 1] = tag
+                        seen[tag] = true
+                    end
+                end
+                go_context.set({ tags = tags }, { root = root })
+            end)
+            pending[root] = nil
+            if not applied then
+                report(apply_err)
             end
-            go_context.set({ tags = tags }, { root = root })
-        end)
-        pending[root] = nil
-        if not applied then
-            report(apply_err)
         end
-    end)
+    )
     if not ok then
         pending[root] = nil
         report(failure)

@@ -13,13 +13,23 @@ local function run()
         assert(bufnr > 0)
         return project
     end
-    workspace.normalize = function(value) return value end
-    store.get = function(key) return vim.deepcopy(saved[key]) end
-    store.set = function(key, value) saved[key] = vim.deepcopy(value) end
-    gopls.update = function(key, value) updates[#updates + 1] = { key, value } end
+    workspace.normalize = function(value)
+        return value
+    end
+    store.get = function(key)
+        return vim.deepcopy(saved[key])
+    end
+    store.set = function(key, value)
+        saved[key] = vim.deepcopy(value)
+    end
+    gopls.update = function(key, value)
+        updates[#updates + 1] = { key, value }
+    end
     vim.api.nvim_create_autocmd("User", {
         pattern = "GoContextChanged",
-        callback = function(event) events[#events + 1] = event.data end,
+        callback = function(event)
+            events[#events + 1] = event.data
+        end,
     })
     require("go-context.ui").select = function(items, opts, callback)
         prompts[#prompts + 1] = { items = items, tags = opts.tags, answer = callback }
@@ -28,7 +38,8 @@ local function run()
     vim.api.nvim_buf_set_name(buf, "/tmp/suggestion.go")
     local function enter(expression)
         vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
-            "//go:build " .. expression, "package foo",
+            "//go:build " .. expression,
+            "package foo",
         })
         vim.api.nvim_exec_autocmds("BufEnter", { buffer = buf })
     end
@@ -69,8 +80,30 @@ local function run()
     prompts[4].answer(nil, nil)
     enter("cancelled")
     assert(#prompts == 4)
+    local ui = require("go-context.ui")
+    local select, notify = ui.select, vim.notify
+    local errors = {}
+    vim.notify = function(message)
+        errors[#errors + 1] = message
+    end
+    ui.select = function()
+        error("window failed")
+    end
+    enter("retry")
+    ui.select = select
+    enter("retry")
+    assert(#prompts == 5, "UI failure must release the workspace lock")
+    store.set = function()
+        error("save failed")
+    end
+    prompts[5].answer(prompts[5].items[1], 1)
+    enter("retry")
+    assert(#prompts == 6, "Save failure must release the workspace lock")
+    assert(#errors == 2)
+    prompts[6].answer(nil, nil)
+    vim.notify = notify
     enter("linux && !enterprise")
-    assert(#prompts == 4)
+    assert(#prompts == 6)
 end
 local ok, err = xpcall(run, debug.traceback)
 if not ok then
